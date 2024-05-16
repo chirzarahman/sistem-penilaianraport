@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin_murid"]) || $_SESSION["loggedin_murid"] !== true) {
+    header("location: ../../login/murid.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,7 +25,7 @@
                 <div class="flex flex-col items-center justify-center pt-8">
                     <img class="w-40 bg-white rounded-3xl object-cover" alt src="../../assets/logo.png" />
                     <p class="text-[29px] mb-[14px] mt-2 text-center">
-                        Paijo Tukimen
+                        <?php echo htmlspecialchars($_SESSION["nama"]); ?>
                     </p>
                     <div class="bg-[#F0F0F6] py-2 px-4 rounded-full w-fit text-sm mb-4">
                         Murid SMK Arimbi
@@ -31,7 +40,7 @@
                             <li class="flex border-b py-2">
                                 <span class="font-bold w-32">NIS</span>
                                 <span class="text-gray-700">:
-                                    8572057490</span>
+                                    <?php echo htmlspecialchars($_SESSION["nis"]); ?></span>
                             </li>
                             <li class="flex border-b py-2">
                                 <span class="font-bold w-32">Kelas</span>
@@ -40,7 +49,7 @@
                             </li>
                         </ul>
                     </div>
-                    <a href="../../index.php"
+                    <a href="../../logout.php"
                         class="bg-[#fd3030] rounded-xl text-white px-8 py-3 mt-10 w-full text-center hover:shadow-xl hover:shadow-[#fd30306a] transition hover:duration-500 cursor-pointer flex items-center justify-center gap-x-2">
                         <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
                             <path clip-rule="evenodd"

@@ -22,12 +22,13 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js">
     </script>
-    <script src="assets/scripts.js" type="module"></script>
+    <script src="assets/js/scripts.js" type="module"></script>
 
     <link rel="icon" href="assets/logo.png" />
 </head>
 
 <body data-target=".fixed-top">
+    <?php //include_once "config/connect.php" echo password_hash('12345', PASSWORD_DEFAULT) ?>
     <nav class="navbar fixed-top">
         <div class="container sm:px-4 lg:px-8 flex flex-wrap items-center justify-between lg:flex-nowrap">
             <a class="inline-block mr-4 py-0.5 text-xl whitespace-nowrap hover:no-underline focus:no-underline flex items-center gap-x-4"

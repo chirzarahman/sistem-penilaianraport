@@ -1,3 +1,14 @@
+<?php
+// Initialize the session
+session_start();
+
+// Check if the user is logged in, if not then redirect him to login page
+if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true) {
+    header("location: ../../login/admin.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,11 +26,11 @@
             <div class="bg-white w-full lg:w-[40%] h-fit rounded-md drop-shadow-2xl mb-10 lg:mb-0">
                 <div class="flex flex-col items-center justify-center pt-8">
                     <img class="w-40 bg-white rounded-3xl object-cover" alt="" src="../../assets/logo.png" />
-                    <p class="text-[29px] mb-[14px] mt-2 text-center">
-                        Admin SMK Arimbi
+                    <p class="text-[29px] mb-[14px] mt-2 text-center capitalize">
+                        <?php echo htmlspecialchars($_SESSION["username"]); ?>
                     </p>
                     <div class="bg-[#F0F0F6] py-2 px-4 rounded-full w-fit text-sm mb-4">
-                        Super Admin
+                        Admin SMK Arimbi
                     </div>
                 </div>
                 <div class="bg-[#F3F6F6] flex flex-col justify-center px-12 py-8 rounded-b-md">
@@ -31,7 +42,7 @@
                             Admin dapat menambah, mengedit, menghapus data guru dan murid
                         </p>
                     </div>
-                    <a href="../../index.php"
+                    <a href="../../logout.php"
                         class="bg-[#fd3030] rounded-xl text-white px-8 py-3 mt-10 w-full text-center hover:shadow-xl hover:shadow-[#fd30306a] transition hover:duration-500 cursor-pointer flex items-center justify-center gap-x-2">
                         <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
                             <path clip-rule="evenodd"

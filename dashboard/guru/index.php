@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin_guru"]) || $_SESSION["loggedin_guru"] !== true) {
+    header("location: ../../login/guru.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,14 +25,22 @@
                 <div class="flex flex-col items-center justify-center pt-8">
                     <img class="w-40 bg-white rounded-3xl object-cover" alt src="../../assets/logo.png" />
                     <p class="text-[29px] mb-[14px] mt-2 text-center">
-                        Guru SMK Arimbi
+                        <?php echo htmlspecialchars($_SESSION["nama_guru"]); ?>
                     </p>
                     <div class="bg-[#F0F0F6] py-2 px-4 rounded-full w-fit text-sm mb-4">
-                        Guru
+                        Guru SMK Arimbi
                     </div>
                 </div>
                 <div class="bg-[#F3F6F6] flex flex-col justify-center px-12 py-8 rounded-b-md">
-                    <div class="mt-5">
+                    <div class="mt-5 flex items-center gap-x-2">
+                        <span class="capitalize font-semibold">
+                            NIG :
+                        </span>
+                        <p class="text-sm">
+                            <?php echo htmlspecialchars($_SESSION["nig"]); ?>
+                        </p>
+                    </div>
+                    <div class="mt-2">
                         <span class="capitalize font-semibold text-lg">
                             Deskripsi
                         </span>
@@ -32,7 +49,7 @@
                             raport
                         </p>
                     </div>
-                    <a href="../../index.php"
+                    <a href="../../logout.php"
                         class="bg-[#fd3030] rounded-xl text-white px-8 py-3 mt-10 w-full text-center hover:shadow-xl hover:shadow-[#fd30306a] transition hover:duration-500 cursor-pointer flex items-center justify-center gap-x-2">
                         <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
                             <path clip-rule="evenodd"
