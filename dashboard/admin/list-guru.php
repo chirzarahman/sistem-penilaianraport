@@ -1,12 +1,15 @@
 <?php
-// Initialize the session
 session_start();
 
-// Check if the user is logged in, if not then redirect him to login page
 if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true) {
     header("location: ../../login/admin.php");
     exit;
 }
+
+require_once "../../config/connect.php";
+
+$list = $conn->query("SELECT nig, nama_guru FROM tbguru");
+
 ?>
 
 <!DOCTYPE html>
@@ -127,36 +130,36 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php foreach ($list as $row) : ?>
                                         <tr>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                 <div class="ml-3">
                                                     <p class="text-gray-900 whitespace-no-wrap">
-                                                        4839579357
+                                                        <?= $row["nig"]; ?>
                                                     </p>
                                                 </div>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">Bapak Budi</p>
+                                                <p class="text-gray-900 whitespace-no-wrap"><?= $row["nama_guru"]; ?>
+                                                </p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                 <div class="flex justify-center items-baseline">
-                                                    <a href='edit/guru.php'
+                                                    <a href='edit/guru.php?nig=<?= $row["nig"]; ?>'
                                                         class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded hover:bg-blue-500 hover:text-white">
                                                         Edit
                                                     </a>
-                                                    <div x-data="{ showModal: false }">
-                                                        <a href='#' @click="showModal = true"
-                                                            class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded hover:bg-red-500 hover:text-white">
+                                                    <!-- <div x-data="{ showModal: false }">
+                                                        <a @click="showModal = true"
+                                                            class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded hover:bg-red-500 hover:text-white cursor-pointer">
                                                             Delete
                                                         </a>
-                                                        <!-- Background overlay -->
                                                         <div x-show="showModal"
                                                             class="fixed inset-0 transition-opacity z-20"
                                                             aria-hidden="true" @click="showModal = false">
                                                             <div class="absolute inset-0 bg-gray-500 opacity-75">
                                                             </div>
                                                         </div>
-                                                        <!-- Modal -->
                                                         <div x-show="showModal"
                                                             x-transition:enter="transition ease-out duration-300 transform"
                                                             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
@@ -167,16 +170,13 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                                                             class="fixed z-30 inset-0 overflow-y-auto" x-cloak>
                                                             <div
                                                                 class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                                                <!-- Modal panel -->
                                                                 <div class="w-full inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
                                                                     role="dialog" aria-modal="true"
                                                                     aria-labelledby="modal-headline">
                                                                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                                                        <!-- Modal content -->
                                                                         <div class="sm:flex sm:items-start">
                                                                             <div
                                                                                 class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                                                                <!-- Heroicon name: outline/exclamation -->
                                                                                 <svg width="64px" height="64px"
                                                                                     class="h-6 w-6 text-red-600"
                                                                                     stroke="currentColor" fill="none"
@@ -220,8 +220,14 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                                                                     </div>
                                                                     <div
                                                                         class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                                                        <a href="#"
-                                                                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                        <a href='hapus/guru.php?nig=<?= $row["nig"]; ?>'
+                                                                            id="delete" class=" w-full inline-flex justify-center
+                                                                            rounded-md border border-transparent
+                                                                            shadow-sm px-4 py-2 bg-red-500 text-base
+                                                                            font-medium text-white hover:bg-red-700
+                                                                            focus:outline-none focus:ring-2
+                                                                            focus:ring-offset-2 focus:ring-red-500
+                                                                            sm:ml-3 sm:w-auto sm:text-sm">
                                                                             Serius</a>
                                                                         <button @click="showModal = false" type="button"
                                                                             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
@@ -230,10 +236,11 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
                                                 </div>
                                             </td>
                                         </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>

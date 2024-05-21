@@ -1,3 +1,140 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true) {
+    header("location: ../../login/admin.php");
+    exit;
+}
+
+// Include config file
+require_once "../../../config/connect.php";
+
+// Define variables and initialize with empty values
+$nig = $nama = "";
+$nig_err = $nama_err = "";
+
+// Processing form data when form is submitted
+if (isset($_POST["nig"]) && !empty($_POST["nig"])) {
+    // Get hidden input value
+    $get_nig = $_POST["nig"];
+
+    // Validate NIG
+    $input_nig = trim($_POST["nig"]);
+    if (empty($input_nig)) {
+        $nig_err = "Mohon masukkan nig.";
+    } else {
+        $nig = $input_nig;
+    }
+    // $input_nig = trim($_POST["nig"]);
+    // if (empty($input_nig)) {
+    //     $nig_err = "Please enter a mig.";
+    // } elseif (!filter_var($input_nig, FILTER_VALIDATE_REGEXP, array("options" => array("regexp" => "/^[a-zA-Z\s]+$/")))) {
+    //     $name_err = "Please enter a valid name.";
+    // } else {
+    //     $name = $input_name;
+    // }
+
+    // Validate nama
+    $input_nama = trim($_POST["nama"]);
+    if (empty($input_nama)) {
+        $nama_err = "Mohon masukkan nama.";
+    } else {
+        $nama = $input_nama;
+    }
+
+    // Validate salary
+    // $input_salary = trim($_POST["salary"]);
+    // if (empty($input_salary)) {
+    //     $salary_err = "Please enter the salary amount.";
+    // } elseif (!ctype_digit($input_salary)) {
+    //     $salary_err = "Please enter a positive integer value.";
+    // } else {
+    //     $salary = $input_salary;
+    // }
+
+    // Check input errors before inserting in database
+    if (empty($nig_err) && empty($nama_err)) {
+        // Prepare an update statement
+        $sql = "UPDATE tbguru SET nig=:nig, nama_guru=:nama WHERE nig=:nig";
+
+        if ($stmt = $conn->prepare($sql)) {
+            // Bind variables to the prepared statement as parameters
+            $stmt->bindParam(":nig", $param_nig);
+            $stmt->bindParam(":nama", $param_nama);
+            // $stmt->bindParam(":id", $param_id);
+
+            // Set parameters
+            $param_nig = $nig;
+            $param_nama = $nama;
+            // $param_id = $id;
+
+            // Attempt to execute the prepared statement
+            if ($stmt->execute()) {
+                // Records updated successfully. Redirect to landing page
+                header("location: ../list-guru.php");
+                exit();
+            } else {
+                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+            }
+        }
+
+        // Close statement
+        unset($stmt);
+    }
+
+    // Close connection
+    unset($conn);
+} else {
+    // Check existence of id parameter before processing further
+    if (isset($_GET["nig"]) && !empty(trim($_GET["nig"]))) {
+        // Get URL parameter
+        $get_nig =  trim($_GET["nig"]);
+
+        // Prepare a select statement
+        $sql = "SELECT * FROM tbguru WHERE nig = :nig";
+        if ($stmt = $conn->prepare($sql)) {
+            // Bind variables to the prepared statement as parameters
+            $stmt->bindParam(":nig", $param_nig);
+
+            // Set parameters
+            $param_nig = $get_nig;
+
+            // Attempt to execute the prepared statement
+            if ($stmt->execute()) {
+                if ($stmt->rowCount() == 1) {
+                    /* Fetch result row as an associative array. Since the result set
+                    contains only one row, we don't need to use while loop */
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    // Retrieve individual field value
+                    $nig = $row["nig"];
+                    $nama = $row["nama_guru"];
+                    // $salary = $row["salary"];
+                } else {
+                    // URL doesn't contain valid id. Redirect to error page
+                    // header("location: error.php");
+                    echo ("gagal error");
+                    exit();
+                }
+            } else {
+                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+            }
+        }
+
+        // Close statement
+        unset($stmt);
+
+        // Close connection
+        unset($conn);
+    } else {
+        // URL doesn't contain id parameter. Redirect to error page
+        // header("location: error.php");
+        echo ("gagal error");
+        exit();
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -75,16 +212,20 @@
                 </div>
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
-                        <form action="#">
+                        <form action="<?php echo htmlspecialchars(basename($_SERVER['REQUEST_URI'])); ?>" method="post">
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="NIG" type="text" />
+                                        placeholder="NIG" name="nig" value="<?php echo $nig; ?>" type="text" />
+                                    <span
+                                        class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $nig_err; ?></span>
                                 </div>
 
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Nama" type="text" />
+                                        placeholder="Nama" name="nama" value="<?php echo $nama; ?>" type="text" />
+                                    <span
+                                        class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $nama_err; ?></span>
                                 </div>
                             </div>
                             <div class="mt-4 flex items-center gap-x-4">

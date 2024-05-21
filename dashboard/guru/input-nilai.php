@@ -1,3 +1,90 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin_guru"]) || $_SESSION["loggedin_guru"] !== true) {
+    header("location: ../../login/guru.php");
+    exit;
+}
+
+require_once "../../config/connect.php";
+
+$nis = $kode = "";
+$nilai_ulangan = $nilai_uts = $nilai_uas = 0;
+$nis_err = $kode_err = $nilai_ulangan_err = $nilai_uts_err = $nilai_uas_err = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate NIS
+    $input_nis = trim($_POST["nis"]);
+    if (empty($input_nis)) {
+        $nis_err = "Mohon masukkan nis.";
+    } else {
+        $nis = $input_nis;
+    }
+
+    // Validate Kode Mata Pelajaran
+    $input_kode = trim($_POST["kode"]);
+    if (empty($input_kode)) {
+        $kode_err = "Mohon masukkan Mata Pelajaran.";
+    } else {
+        $kode = $input_kode;
+    }
+
+    // Validate Nilai Ulangan
+    $input_nilai_ulangan = trim($_POST["nilai_ulangan"]);
+    if (empty($input_nilai_ulangan)) {
+        $nilai_ulangan_err = "Mohon masukkan Nilai Ulangan.";
+    } else {
+        $nilai_ulangan = $input_nilai_ulangan;
+    }
+
+    // Validate Nilai UTS
+    $input_nilai_uts = trim($_POST["nilai_uts"]);
+    if (empty($input_nilai_uts)) {
+        $nilai_uas_err = "Mohon masukkan Nilai UTS.";
+    } else {
+        $nilai_uts = $input_nilai_uts;
+    }
+
+    // Validate Nilai UAS
+    $input_nilai_uas = trim($_POST["nilai_uas"]);
+    if (empty($input_nilai_uas)) {
+        $nilai_uas_err = "Mohon masukkan Nilai UAS.";
+    } else {
+        $nilai_uas = $input_nilai_uas;
+    }
+
+    if (empty($nig_err) && empty($nama_err) && empty($password_err)) {
+        $sql = "INSERT INTO tbnilai (nis, kode, nilai_ulangan, nilai_uts, nilai_uas) VALUES (:nis, :kode, :nilai_ulangan, :nilai_uts, :nilai_uas)";
+
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bindParam(":nis", $param_nis);
+            $stmt->bindParam(":kode", $param_kode);
+            $stmt->bindParam(":nilai_ulangan", $param_nilai_ulangan);
+            $stmt->bindParam(":nilai_uts", $param_nilai_uts);
+            $stmt->bindParam(":nilai_uas", $param_nilai_uas);
+
+            // Set parameters
+            $param_nis = $nis;
+            $param_kode = $kode;
+            $param_nilai_ulangan = $nilai_ulangan;
+            $param_nilai_uts = $nilai_uts;
+            $param_nilai_uas = $nilai_uas;
+
+            if ($stmt->execute()) {
+                header("location: index.php");
+                exit();
+            } else {
+                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+            }
+        }
+
+        unset($stmt);
+    }
+
+    unset($conn);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -72,10 +159,10 @@
                 </div>
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="py-8">
-                        <form action="#">
+                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                             <div class="flex flex-col gap-y-4 mb-4">
                                 <div class="flex items-center gap-x-4">
-                                    <div x-data="{ showModal: false }">
+                                    <!-- <div x-data="{ showModal: false }">
                                         <button type="submit" @click="showModal = true"
                                             class="inline-block w-full rounded-lg bg-blue-500 px-3 py-1.5 font-medium text-white sm:w-auto">
                                             Pilih Murid
@@ -120,12 +207,15 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                     <p><span class="font-medium">Nama Murid </span>: -</p>
+                                    <input type="text" name="nis"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        placeholder="NIS">
                                 </div>
                                 <div class="flex items-center gap-x-4">
-                                    <div x-data="{ showModal: false }">
+                                    <!-- <div x-data="{ showModal: false }">
                                         <button type="submit" @click="showModal = true"
                                             class="inline-block w-full rounded-lg bg-blue-500 px-3 py-1.5 font-medium text-white sm:w-auto">
                                             Pilih Mata Pelajaran
@@ -171,21 +261,25 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
+
                                     <p><span class="font-medium">Mata Pelajaran </span>: -</p>
+                                    <input type="text" name="kode"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        placeholder="Mata Pelajaran">
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div class="relative">
-                                    <input type="text" id="nilai_ul"
+                                    <input type="number" name="nilai_ulangan" id="nilai_ul"
                                         class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                                        placeholder=" " />
+                                        placeholder="" />
                                     <label for="nilai_ul"
                                         class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Nilai
                                         Ulangan</label>
                                 </div>
                                 <div class="relative">
-                                    <input type="text" id="nilai_uts"
+                                    <input type="number" name="nilai_uts" id="nilai_uts"
                                         class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                         placeholder=" " />
                                     <label for="nilai_uts"
@@ -193,7 +287,7 @@
                                         UTS</label>
                                 </div>
                                 <div class="relative col-span-2">
-                                    <input type="text" id="nilai_uas"
+                                    <input type="number" name="nilai_uas" id="nilai_uas"
                                         class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                         placeholder=" " />
                                     <label for="nilai_uas"
@@ -234,5 +328,25 @@
     </main>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2"></script>
+<script>
+document.querySelector('input[list]').addEventListener('input', function(e) {
+    var input = e.target,
+        list = input.getAttribute('list'),
+        options = document.querySelectorAll('#' + list + ' option'),
+        hiddenInput = document.getElementById(input.getAttribute('id') + '-hidden'),
+        inputValue = input.value;
+
+    hiddenInput.value = inputValue;
+
+    for (var i = 0; i < options.length; i++) {
+        var option = options[i];
+
+        if (option.innerText === inputValue) {
+            hiddenInput.value = option.getAttribute('data-value');
+            break;
+        }
+    }
+});
+</script>
 
 </html>

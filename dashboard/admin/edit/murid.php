@@ -1,3 +1,91 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true) {
+    header("location: ../../login/admin.php");
+    exit;
+}
+
+// require_once "../../../config/connect.php";
+
+// $nig = $nama = "";
+// $nig_err = $nama_err = "";
+
+// if (isset($_POST["nig"]) && !empty($_POST["nig"])) {
+//     $get_nig = $_POST["nig"];
+
+//     $input_nig = trim($_POST["nig"]);
+//     if (empty($input_nig)) {
+//         $nig_err = "Mohon masukkan nig.";
+//     } else {
+//         $nig = $input_nig;
+//     }
+
+//     $input_nama = trim($_POST["nama"]);
+//     if (empty($input_nama)) {
+//         $nama_err = "Mohon masukkan nama.";
+//     } else {
+//         $nama = $input_nama;
+//     }
+
+//     if (empty($nig_err) && empty($nama_err)) {
+//         $sql = "UPDATE tbguru SET nig=:nig, nama_guru=:nama WHERE nig=:nig";
+
+//         if ($stmt = $conn->prepare($sql)) {
+//             $stmt->bindParam(":nig", $param_nig);
+//             $stmt->bindParam(":nama", $param_nama);
+
+//             $param_nig = $nig;
+//             $param_nama = $nama;
+
+//             if ($stmt->execute()) {
+//                 header("location: ../list-guru.php");
+//                 exit();
+//             } else {
+//                 echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+//             }
+//         }
+
+//         unset($stmt);
+//     }
+
+//     unset($conn);
+// } else {
+//     if (isset($_GET["nig"]) && !empty(trim($_GET["nig"]))) {
+//         $get_nig =  trim($_GET["nig"]);
+
+//         $sql = "SELECT * FROM tbguru WHERE nig = :nig";
+//         if ($stmt = $conn->prepare($sql)) {
+//             $stmt->bindParam(":nig", $param_nig);
+
+//             $param_nig = $get_nig;
+
+//             if ($stmt->execute()) {
+//                 if ($stmt->rowCount() == 1) {
+//                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+//                     $nig = $row["nig"];
+//                     $nama = $row["nama_guru"];
+//                 } else {
+//                     // header("location: error.php");
+//                     echo ("gagal error");
+//                     exit();
+//                 }
+//             } else {
+//                 echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+//             }
+//         }
+
+//         unset($stmt);
+//         unset($conn);
+//     } else {
+//         // header("location: error.php");
+//         echo ("gagal error");
+//         exit();
+//     }
+// }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 

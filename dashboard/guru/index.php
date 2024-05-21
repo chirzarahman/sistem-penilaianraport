@@ -5,6 +5,11 @@ if (!isset($_SESSION["loggedin_guru"]) || $_SESSION["loggedin_guru"] !== true) {
     header("location: ../../login/guru.php");
     exit;
 }
+
+require_once "../../config/connect.php";
+
+$list = $conn->query("SELECT * FROM tbnilai");
+
 ?>
 
 <!DOCTYPE html>
@@ -147,10 +152,11 @@ if (!isset($_SESSION["loggedin_guru"]) || $_SESSION["loggedin_guru"] !== true) {
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php foreach ($list as $row) : ?>
                                         <tr class="hover:bg-gray-200">
                                             <td class="px-5 py-5 border-b border-gray-200 text-sm">
                                                 <div class="ml-3">
-                                                    4839579357
+                                                    <?= $row["nis"]; ?>
                                                 </div>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 text-sm">
@@ -163,7 +169,34 @@ if (!isset($_SESSION["loggedin_guru"]) || $_SESSION["loggedin_guru"] !== true) {
                                                 <p class="text-gray-900 whitespace-no-wrap">Matematika</p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">B</p>
+                                                <p class="text-gray-900 whitespace-no-wrap text-center">
+                                                    <?php 
+                                                    $ulangan = $row["nilai_ulangan"];
+                                                    $uts = $row["nilai_uts"];
+                                                    $uas = $row["nilai_uas"];
+                                                    $result = ((2*$ulangan)+$uts+$uas) / 4;
+                                                    if($result >= 85) {
+                                                        $raport = 'A';
+                                                    } else if ($result >= 75) {
+                                                        $raport = 'B';
+                                                    } else if ($result >= 65) {
+                                                        $raport = 'C';
+                                                    } else if ($result >= 45) {
+                                                        $raport = 'D';
+                                                    } else {
+                                                        $raport = 'E';
+                                                    }
+                                                    
+                                                    if ($raport == 'A' || $raport == 'B' || $raport == 'C') {
+                                                        $final = 'Lulus';
+                                                    } elseif ($raport == 'D') {
+                                                        $final = 'Diambang Tidak Lulus';
+                                                    } else {
+                                                        $final = 'Tidak Lulus';
+                                                    }
+                                                    ?>
+                                                    <?= $raport.' - '.$final ?>
+                                                </p>
                                             </td>
                                             <td
                                                 class="px-5 py-5 border-b border-gray-200 text-sm flex justify-center items-baseline">
@@ -279,6 +312,7 @@ if (!isset($_SESSION["loggedin_guru"]) || $_SESSION["loggedin_guru"] !== true) {
                                                 </div>
                                             </td>
                                         </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>

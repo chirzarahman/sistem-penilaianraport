@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true) {
+    header("location: ../../login/admin.php");
+    exit;
+}
+
+require_once "../../config/connect.php";
+
+$list = $conn->query("SELECT * FROM tbmurid");
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -113,16 +127,17 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php foreach ($list as $row) : ?>
                                         <tr>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                 <div class="ml-3">
                                                     <p class="text-gray-900 whitespace-no-wrap">
-                                                        4839579357
+                                                        <?= $row["nis"]; ?>
                                                     </p>
                                                 </div>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">Tono</p>
+                                                <p class="text-gray-900 whitespace-no-wrap"><?= $row["nama"]; ?></p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                 <div class="flex justify-center items-baseline">
@@ -130,13 +145,14 @@
                                                         class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded hover:bg-blue-500 hover:text-white">
                                                         Edit
                                                     </a>
-                                                    <a href='#' class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5
+                                                    <!-- <a href='#' class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5
                                                         py-0.5 rounded hover:bg-red-500 hover:text-white">
                                                         Delete
-                                                    </a>
+                                                    </a> -->
                                                 </div>
                                             </td>
                                         </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>

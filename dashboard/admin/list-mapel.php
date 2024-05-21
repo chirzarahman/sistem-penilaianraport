@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true) {
+    header("location: ../../login/admin.php");
+    exit;
+}
+
+require_once "../../config/connect.php";
+
+$list = $conn->query("SELECT * FROM tbmapel");
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -124,20 +138,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php foreach ($list as $row) : ?>
                                         <tr>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm ml-3">
                                                 <p class="text-gray-900 whitespace-no-wrap">
-                                                    MTK-6
+                                                    <?= $row["kode"]; ?>
                                                 </p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm ml-3">
                                                 <p class="text-gray-900 whitespace-no-wrap">
-                                                    6
+                                                    <?= $row["kelas"]; ?>
                                                 </p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm ml-3">
                                                 <p class="text-gray-900 whitespace-no-wrap">
-                                                    Matematika
+                                                    <?= $row["mata_pelajaran"]; ?>
                                                 </p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -234,6 +249,7 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>

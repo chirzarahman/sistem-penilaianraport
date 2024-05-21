@@ -1,3 +1,89 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true) {
+    header("location: ../../login/admin.php");
+    exit;
+}
+
+// Include config file
+require_once "../../../config/connect.php";
+
+// Define variables and initialize with empty values
+$nig = $nama = $password = "";
+$nig_err = $nama_err = $password_err = "";
+
+// Processing form data when form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate NIG
+    $input_nig = trim($_POST["nig"]);
+    if (empty($input_nig)) {
+        $nig_err = "Mohon masukkan nig.";
+    } else {
+        $nig = $input_nig;
+    }
+    // $input_nig = trim($_POST["nig"]);
+    // if (empty($input_nig)) {
+    //     $nig_err = "Please enter a nig.";
+    // } elseif (!filter_var($input_nig, FILTER_VALIDATE_REGEXP, array("options" => array("regexp" => "/[^0-9]/")))) {
+    //     $nig_err = "Please enter a valid nig.";
+    // } else {
+    //     $nig = $input_nig;
+    // }
+
+    // Validate Nama
+    $input_nama = trim($_POST["nama"]);
+    if (empty($input_nama)) {
+        $nama_err = "Mohon masukkan nama.";
+    } else {
+        $nama = $input_nama;
+    }
+
+    // Validate password
+    // $input_salary = trim($_POST["salary"]);
+    // if (empty($input_salary)) {
+    //     $salary_err = "Please enter the salary amount.";
+    // } elseif (!ctype_digit($input_salary)) {
+    //     $salary_err = "Please enter a positive integer value.";
+    // } else {
+    //     $salary = $input_salary;
+    // }
+
+    // Check input errors before inserting in database
+    if (empty($nig_err) && empty($nama_err) && empty($password_err)) {
+        // Prepare an insert statement
+        $sql = "INSERT INTO tbguru (nig, nama_guru, password_guru) VALUES (:nig, :nama, :password)";
+
+        if ($stmt = $conn->prepare($sql)) {
+            // Bind variables to the prepared statement as parameters
+            $stmt->bindParam(":nig", $param_nig);
+            $stmt->bindParam(":nama", $param_nama);
+            $stmt->bindParam(":password", $param_password);
+
+            // Set parameters
+            $param_nig = $nig;
+            $param_nama = $nama;
+            $param_password = password_hash($password, PASSWORD_DEFAULT);
+
+            // Attempt to execute the prepared statement
+            if ($stmt->execute()) {
+                // Records created successfully. Redirect to landing page
+                header("location: ../list-guru.php");
+                exit();
+            } else {
+                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+            }
+        }
+
+        // Close statement
+        unset($stmt);
+    }
+
+    // Close connection
+    unset($conn);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -75,16 +161,27 @@
                 </div>
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
-                        <form action="#">
+                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="NIG" type="text" />
+                                        placeholder="NIG" name="nig" type="text" />
+                                    <span
+                                        class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $nig_err; ?></span>
                                 </div>
 
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Nama" type="text" />
+                                        placeholder="Nama" name="nama" type="text" />
+                                    <span
+                                        class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $nama_err; ?></span>
+                                </div>
+
+                                <div>
+                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
+                                        placeholder="Password" name="password" type="text" value="12345" />
+                                    <span
+                                        class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $password_err; ?></span>
                                 </div>
                             </div>
                             <div class="mt-4 flex items-center gap-x-4">
