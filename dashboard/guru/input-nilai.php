@@ -53,32 +53,83 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $nilai_uas = $input_nilai_uas;
     }
 
-    if (empty($nig_err) && empty($nama_err) && empty($password_err)) {
-        $sql = "INSERT INTO tbnilai (nis, kode, nilai_ulangan, nilai_uts, nilai_uas) VALUES (:nis, :kode, :nilai_ulangan, :nilai_uts, :nilai_uas)";
-
+    if (empty($nis_err) && empty($nama_err) && empty($password_err)) {
+        $rowExists = true;
+        $sql = "SELECT 1 FROM `tbnilai` WHERE nis = :nis AND kode = :kode";
         if ($stmt = $conn->prepare($sql)) {
-            $stmt->bindParam(":nis", $param_nis);
-            $stmt->bindParam(":kode", $param_kode);
-            $stmt->bindParam(":nilai_ulangan", $param_nilai_ulangan);
-            $stmt->bindParam(":nilai_uts", $param_nilai_uts);
-            $stmt->bindParam(":nilai_uas", $param_nilai_uas);
-
-            // Set parameters
-            $param_nis = $nis;
-            $param_kode = $kode;
-            $param_nilai_ulangan = $nilai_ulangan;
-            $param_nilai_uts = $nilai_uts;
-            $param_nilai_uas = $nilai_uas;
-
-            if ($stmt->execute()) {
-                header("location: index.php");
-                exit();
-            } else {
-                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
-            }
+            $stmt->bindParam(":nis", $input_nis);
+            $stmt->bindParam(":kode", $input_kode);
+            $stmt->execute();
+            $row = $stmt->fetch();
+            $rowExists = (bool)$row;
         }
-
         unset($stmt);
+
+        if (!$rowExists) {
+            $sql = "INSERT INTO tbnilai (nis, kode, nilai_ulangan, nilai_uts, nilai_uas) VALUES (:nis, :kode, :nilai_ulangan, :nilai_uts, :nilai_uas)";
+
+            if ($stmt = $conn->prepare($sql)) {
+                $stmt->bindParam(":nis", $param_nis);
+                $stmt->bindParam(":kode", $param_kode);
+                $stmt->bindParam(":nilai_ulangan", $param_nilai_ulangan);
+                $stmt->bindParam(":nilai_uts", $param_nilai_uts);
+                $stmt->bindParam(":nilai_uas", $param_nilai_uas);
+
+                // Set parameters
+                $param_nis = $nis;
+                $param_kode = $kode;
+                $param_nilai_ulangan = $nilai_ulangan;
+                $param_nilai_uts = $nilai_uts;
+                $param_nilai_uas = $nilai_uas;
+
+                if ($stmt->execute()) {
+                    header("location: index.php");
+                    exit();
+                } else {
+                    echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+                }
+            }
+
+            unset($stmt);
+        } else {
+            echo '<div class="fixed z-10 inset-0 overflow-y-auto" id="my-modal">
+                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                        </div>
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+                            role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                            <div>
+                                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                                    <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </div>
+                                <div class="mt-3 text-center sm:mt-5">
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                                        Error
+                                    </h3>
+                                    <div class="mt-2">
+                                        <p class="text-sm text-gray-500">
+                                            Nama Siswa dan Mata Pelajaran tersebut sudah terdata
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-5 sm:mt-6">
+                                <a
+                                    href="input-nilai.php"
+                                    class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
+                                    OK
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>';
+        }
     }
 
     unset($conn);
@@ -148,7 +199,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <a href="profile.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
                                         hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
-                        <span class=" text-sm font-medium mt-1 capitalize">profile</span>
+                        <span class=" text-sm font-medium mt-1 capitalize">Ganti Password</span>
                     </a>
                 </div>
             </div>
@@ -161,7 +212,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="py-8">
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                             <div class="flex flex-col gap-y-4 mb-4">
-                                <div class="flex items-center gap-x-4">
+                                <div class="flex items-center gap-x-2">
                                     <!-- <div x-data="{ showModal: false }">
                                         <button type="submit" @click="showModal = true"
                                             class="inline-block w-full rounded-lg bg-blue-500 px-3 py-1.5 font-medium text-white sm:w-auto">
@@ -209,12 +260,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                     </div> -->
 
-                                    <p><span class="font-medium">Nama Murid </span>: -</p>
-                                    <input type="text" name="nis"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                        placeholder="NIS">
+                                    <p class="font-medium text-nowrap">Nama Murid</p>
+                                    <input list="muridList" name="nis"
+                                        class="rounded-lg border border-gray-300 p-2 w-full">
+                                    <datalist id="muridList">
+                                        <?php
+                                        $list = $conn->query("SELECT nis, nama FROM tbmurid");
+                                        foreach ($list as $row) :
+                                        ?>
+                                        <option><?= $row["nis"] ?></option>
+                                        <?php endforeach; ?>
+                                    </datalist>
+
                                 </div>
-                                <div class="flex items-center gap-x-4">
+                                <div class="flex items-center gap-x-2">
                                     <!-- <div x-data="{ showModal: false }">
                                         <button type="submit" @click="showModal = true"
                                             class="inline-block w-full rounded-lg bg-blue-500 px-3 py-1.5 font-medium text-white sm:w-auto">
@@ -263,10 +322,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                     </div> -->
 
-                                    <p><span class="font-medium">Mata Pelajaran </span>: -</p>
-                                    <input type="text" name="kode"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                        placeholder="Mata Pelajaran">
+                                    <p class="font-medium text-nowrap">Mata Pelajaran</p>
+                                    <input list="mapelList" name="kode"
+                                        class="rounded-lg border border-gray-300 p-2 w-full">
+                                    <datalist id="mapelList">
+                                        <?php
+                                        $param_nig = $_SESSION["nig"];
+                                        $list = $conn->query("SELECT kode, mata_pelajaran FROM tbmapel WHERE nig = $param_nig");
+                                        foreach ($list as $row) :
+                                        ?>
+                                        <option><?= $row["kode"] ?></option>
+                                        <?php endforeach; ?>
+                                    </datalist>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -313,14 +380,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="flex flex-col justify-center px-12 py-8 gap-y-4">
                     <a href="index.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">Raport
                             Murid</span>
                     </a>
                     <a href="profile.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
-                        <span class=" text-sm font-medium mt-1 capitalize">profile</span>
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
+                        <span class=" text-sm font-medium mt-1 capitalize">Ganti Password</span>
                     </a>
                 </div>
             </div>
@@ -329,24 +396,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </body>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2"></script>
 <script>
-document.querySelector('input[list]').addEventListener('input', function(e) {
-    var input = e.target,
-        list = input.getAttribute('list'),
-        options = document.querySelectorAll('#' + list + ' option'),
-        hiddenInput = document.getElementById(input.getAttribute('id') + '-hidden'),
-        inputValue = input.value;
+// document.querySelector('#mapelInput').addEventListener('input', function(e) {
+//     var input = e.target,
+//         list = input.getAttribute('list'),
+//         options = document.querySelectorAll('#' + list + ' option'),
+//         hiddenInput = document.getElementById(input.getAttribute('id') + '-hidden'),
+//         inputValue = input.value;
 
-    hiddenInput.value = inputValue;
+//     hiddenInput.value = inputValue;
 
-    for (var i = 0; i < options.length; i++) {
-        var option = options[i];
+//     for (var i = 0; i < options.length; i++) {
+//         var option = options[i];
 
-        if (option.innerText === inputValue) {
-            hiddenInput.value = option.getAttribute('data-value');
-            break;
-        }
-    }
-});
+//         if (option.innerText === inputValue) {
+//             hiddenInput.value = option.getAttribute('data-value');
+//             break;
+//         }
+//     }
+// });
 </script>
 
 </html>

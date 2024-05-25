@@ -5,6 +5,20 @@ if (!isset($_SESSION["loggedin_murid"]) || $_SESSION["loggedin_murid"] !== true)
     header("location: ../../login/murid.php");
     exit;
 }
+
+require_once "../../config/connect.php";
+
+$param_nis = $_SESSION["nis"];
+if (isset($_GET['kelas']) && $_GET['kelas'] != '') {
+    $kelas = $_GET['kelas'];
+    $list = $conn->query("SELECT tbnilai.*, tbmurid.*, tbmapel.*, tbguru.nama_guru FROM tbnilai JOIN tbmurid ON tbnilai.nis=tbmurid.nis
+    JOIN tbmapel ON tbnilai.kode=tbmapel.kode JOIN tbguru ON tbmapel.nig=tbguru.nig WHERE tbmurid.nis = $param_nis AND tbmapel.kelas = $kelas");
+} else {
+    $list = $conn->query("SELECT tbnilai.*, tbmurid.*, tbmapel.*, tbguru.nama_guru FROM tbnilai JOIN tbmurid ON tbnilai.nis=tbmurid.nis
+    JOIN tbmapel ON tbnilai.kode=tbmapel.kode JOIN tbguru ON tbmapel.nig=tbguru.nig WHERE tbmurid.nis = $param_nis");
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -42,11 +56,11 @@ if (!isset($_SESSION["loggedin_murid"]) || $_SESSION["loggedin_murid"] !== true)
                                 <span class="text-gray-700">:
                                     <?php echo htmlspecialchars($_SESSION["nis"]); ?></span>
                             </li>
-                            <li class="flex border-b py-2">
+                            <!-- <li class="flex border-b py-2">
                                 <span class="font-bold w-32">Kelas</span>
                                 <span class="text-gray-700">:
                                     6</span>
-                            </li>
+                            </li> -->
                         </ul>
                     </div>
                     <a href="../../logout.php"
@@ -87,9 +101,54 @@ if (!isset($_SESSION["loggedin_murid"]) || $_SESSION["loggedin_murid"] !== true)
                 </div>
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="py-8">
-                        <a href="#"
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm">
-                            Export</a>
+                        <div class="flex flex-col md:flex-row gap-y-3 md:gap-y-0 md:items-center md:justify-between">
+                            <div>
+                                <?php
+                                if (isset($_GET['kelas']) && $_GET['kelas'] != '') {
+                                    if($list->rowCount() > 0){
+                                    $kelas = $_GET['kelas'];
+                                    echo '<a href="export-pdf.php?kelas='.$kelas.'"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm
+                                px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700
+                                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto
+                                sm:text-sm">
+                                Export</a>';
+                                    } else {
+                                        echo 'Data Kosong';
+                                    }
+                                } else {
+                                echo 'Jika Export Pilih Kelas Terlebih dahulu';
+                                }
+                                ?>
+
+                            </div>
+                            <div class="flex gap-x-2">
+                                <form action="" method="GET" class="flex items-center gap-x-2">
+                                    <select required name="kelas"
+                                        class="p-2 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none border-neutral-700 border">
+                                        <option selected disabled>Pilih Kelas</option>
+                                        <option value="1"
+                                            <?= isset($_GET['kelas']) == true ? ($_GET['kelas'] == '1' ? 'selected' : '') : '' ?>>
+                                            1
+                                        </option>
+                                        <option value="2"
+                                            <?= isset($_GET['kelas']) == true ? ($_GET['kelas'] == '2' ? 'selected' : '') : '' ?>>
+                                            2</option>
+                                        <option value="3"
+                                            <?= isset($_GET['kelas']) == true ? ($_GET['kelas'] == '3' ? 'selected' : '') : '' ?>>
+                                            3</option>
+                                    </select>
+                                    <button
+                                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm"
+                                        type="submit">
+                                        Filter
+                                    </button>
+                                    <a href="index.php"
+                                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:w-auto sm:text-sm">
+                                        Reset</a>
+                                </form>
+                            </div>
+                        </div>
                         <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
                             <div class="inline-block min-w-full rounded-lg overflow-hidden">
                                 <table class="min-w-full leading-normal">
@@ -114,15 +173,44 @@ if (!isset($_SESSION["loggedin_murid"]) || $_SESSION["loggedin_murid"] !== true)
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="hover:bg-gray-200">
+                                        <?php foreach ($list as $row) : ?> <tr class="hover:bg-gray-200">
                                             <td class="px-5 py-5 border-b border-gray-200 text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">Matematika</p>
+                                                <p class="text-gray-900 whitespace-no-wrap">
+                                                    <?= $row["mata_pelajaran"]; ?></p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">Pak Budi</p>
+                                                <p class="text-gray-900 whitespace-no-wrap">
+                                                    <?= $row["nama_guru"]; ?></p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">B</p>
+                                                <p class="text-gray-900 whitespace-no-wrap">
+                                                    <?php
+                                                        $ulangan = $row["nilai_ulangan"];
+                                                        $uts = $row["nilai_uts"];
+                                                        $uas = $row["nilai_uas"];
+                                                        $result = ($ulangan + $uts + $uas) / 3;
+                                                        if ($result >= 85) {
+                                                            $raport = 'A';
+                                                        } else if ($result >= 75) {
+                                                            $raport = 'B';
+                                                        } else if ($result >= 65) {
+                                                            $raport = 'C';
+                                                        } else if ($result >= 45) {
+                                                            $raport = 'D';
+                                                        } else {
+                                                            $raport = 'E';
+                                                        }
+
+                                                        if ($raport == 'A' || $raport == 'B' || $raport == 'C') {
+                                                            $final = 'Lulus';
+                                                        } elseif ($raport == 'D') {
+                                                            $final = 'Diambang Tidak Lulus';
+                                                        } else {
+                                                            $final = 'Tidak Lulus';
+                                                        }
+                                                        ?>
+                                                    <?= $raport . ' - ' . $final ?>
+                                                </p>
                                             </td>
                                             <td
                                                 class="px-5 py-5 border-b border-gray-200 text-sm flex justify-center items-baseline">
@@ -165,61 +253,61 @@ if (!isset($_SESSION["loggedin_murid"]) || $_SESSION["loggedin_murid"] !== true)
                                                                                         <span
                                                                                             class="font-bold w-32">NIS</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            8572057490</span>
+                                                                                            <?= $row["nis"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Nama</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            Khoirul Anwar</span>
+                                                                                            <?= $row["nama"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Kelas</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            6</span>
+                                                                                            <?= $row["kelas"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Mata
                                                                                             Pelajaran</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            Matematika</span>
+                                                                                            <?= $row["mata_pelajaran"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Guru
                                                                                             Pengampu</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            Pak Joko</span>
+                                                                                            <?= $row["nama_guru"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Nilai
                                                                                             Ulangan</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            80</span>
+                                                                                            <?= $row["nilai_ulangan"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Nilai
                                                                                             UTS</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            80</span>
+                                                                                            <?= $row["nilai_uas"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Nilai
                                                                                             UAS</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            80</span>
+                                                                                            <?= $row["nilai_uas"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Hasil
                                                                                             Raport</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            B</span>
+                                                                                            <?= $raport . ' - ' . $final ?></span>
                                                                                     </li>
                                                                                 </ul>
                                                                             </div>
@@ -238,6 +326,7 @@ if (!isset($_SESSION["loggedin_murid"]) || $_SESSION["loggedin_murid"] !== true)
                                                 </div>
                                             </td>
                                         </tr>
+                                        <?php endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>

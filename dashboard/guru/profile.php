@@ -1,3 +1,72 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin_guru"]) || $_SESSION["loggedin_guru"] !== true) {
+    header("location: ../../login/guru.php");
+    exit;
+}
+
+require_once "../../config/connect.php";
+
+$new_password = $confirm_password = "";
+$new_password_err = $confirm_password_err = "";
+
+// Processing form data when form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // Validate new password
+    if (empty(trim($_POST["new_password"]))) {
+        $new_password_err = "Mohon masukkan password baru.";
+    } elseif (strlen(trim($_POST["new_password"])) < 6) {
+        $new_password_err = "Kata sandi harus memiliki minimal 6 karakter.";
+    } else {
+        $new_password = trim($_POST["new_password"]);
+    }
+
+    // Validate confirm password
+    if (empty(trim($_POST["confirm_password"]))) {
+        $confirm_password_err = "Mohon masukkan konfirmasi password.";
+    } else {
+        $confirm_password = trim($_POST["confirm_password"]);
+        if (empty($new_password_err) && ($new_password != $confirm_password)) {
+            $confirm_password_err = "Kata sandi tidak cocok.";
+        }
+    }
+
+    // Check input errors before updating the database
+    if (empty($new_password_err) && empty($confirm_password_err)) {
+        // Prepare an update statement
+        $sql = "UPDATE tbguru SET password_guru = :password WHERE nig = :nig";
+
+        if ($stmt = $conn->prepare($sql)) {
+            // Bind variables to the prepared statement as parameters
+            $stmt->bindParam(":password", $param_password, PDO::PARAM_STR);
+            $stmt->bindParam(":nig", $param_nig, PDO::PARAM_STR);
+
+            // Set parameters
+            $param_password = password_hash($new_password, PASSWORD_DEFAULT);
+            $param_nig = $_SESSION["nig"];
+
+            // Attempt to execute the prepared statement
+            if ($stmt->execute()) {
+                // Password updated successfully. Destroy the session, and redirect to login page
+                session_destroy();
+                header("location: index.php");
+                exit();
+            } else {
+                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+            }
+
+            // Close statement
+            unset($stmt);
+        }
+    }
+
+    // Close connection
+    unset($conn);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -60,7 +129,7 @@
                     <a href="profile.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
                                         hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white">
-                        <span class=" text-sm font-medium mt-1 capitalize">profile</span>
+                        <span class=" text-sm font-medium mt-1 capitalize">Ganti Password</span>
                     </a>
                 </div>
             </div>
@@ -71,26 +140,37 @@
                 </div>
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="py-8">
-                        <form action="#">
+                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+
+                            <!-- <div>
+                                <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm hidden"
+                                    placeholder="NIG" name="nig" value="<?php echo $nig; ?>" type="text" />
+                            </div> -->
+
+                            <!-- <div>
+                                <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm" placeholder="Nama"
+                                    name="nama" value="<?php echo $nama; ?>" type="text" />
+                            </div> -->
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="NIG" type="text" />
+                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm mb-1"
+                                        placeholder="Password" id="password" name="new_password" type="password" />
+                                    <span
+                                        class="peer-invalid:visible text-pink-600 text-sm"><?php echo $new_password_err; ?></span>
+                                    <div class="flex items-center mt-1">
+                                        <input id="visibility-password" onclick="visibilityPass()" type="checkbox"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+                                        <label for="visibility-password"
+                                            class="ms-2 text-sm font-medium text-gray-900">Lihat
+                                            Password</label>
+                                    </div>
                                 </div>
-
                                 <div>
-                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Nama" type="text" />
-                                </div>
-
-                                <div>
-                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Password" type="password" />
-                                </div>
-
-                                <div>
-                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Konfirmasi Password" type="password" />
+                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm mb-1"
+                                        placeholder="Konfirmasi Password" id="password" name="confirm_password"
+                                        type="password" />
+                                    <span
+                                        class="peer-invalid:visible text-pink-600 text-sm"><?php echo $confirm_password_err; ?></span>
                                 </div>
                             </div>
                             <div class="mt-4 flex items-center gap-x-4">
@@ -110,14 +190,14 @@
             <div class="bg-white w-full lg:w-fit h-fit rounded-md shadow-2xl hidden lg:block">
                 <div class="flex flex-col justify-center px-12 py-8 gap-y-4">
                     <a href="index.php" class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                    hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
+                    hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">Raport
                             Murid</span>
                     </a>
                     <a href="profile.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white">
-                        <span class=" text-sm font-medium mt-1 capitalize">profile</span>
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white text-center">
+                        <span class=" text-sm font-medium mt-1 capitalize">Ganti Password</span>
                     </a>
                 </div>
             </div>
@@ -125,5 +205,15 @@
     </main>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2"></script>
+<script>
+function visibilityPass() {
+    var x = document.getElementById("password");
+    if (x.type === "password") {
+        x.type = "text";
+    } else {
+        x.type = "password";
+    }
+}
+</script>
 
 </html>

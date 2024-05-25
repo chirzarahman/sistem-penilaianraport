@@ -8,7 +8,15 @@ if (!isset($_SESSION["loggedin_guru"]) || $_SESSION["loggedin_guru"] !== true) {
 
 require_once "../../config/connect.php";
 
-$list = $conn->query("SELECT * FROM tbnilai");
+$param_nig = $_SESSION["nig"];
+if (isset($_GET['cari'])) {
+    $cari = $_GET['cari'];
+    $list = $conn->query("SELECT tbnilai.*, tbmurid.*, tbmapel.* FROM tbnilai INNER JOIN tbmurid ON tbnilai.nis=tbmurid.nis
+INNER JOIN tbmapel ON tbnilai.kode=tbmapel.kode WHERE tbmapel.nig = $param_nig LIKE '%" . $cari . "%'");
+} else {
+    $list = $conn->query("SELECT tbnilai.*, tbmurid.*, tbmapel.* FROM tbnilai INNER JOIN tbmurid ON tbnilai.nis=tbmurid.nis
+INNER JOIN tbmapel ON tbnilai.kode=tbmapel.kode WHERE tbmapel.nig = $param_nig");
+}
 
 ?>
 
@@ -83,7 +91,7 @@ $list = $conn->query("SELECT * FROM tbnilai");
                     <a href="profile.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
                                         hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
-                        <span class=" text-sm font-medium mt-1 capitalize">profile</span>
+                        <span class=" text-sm font-medium mt-1 capitalize">Ganti Password</span>
                     </a>
                 </div>
             </div>
@@ -99,25 +107,26 @@ $list = $conn->query("SELECT * FROM tbnilai");
                                 <a href="input-nilai.php"
                                     class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm">
                                     Input Nilai</a>
-                                <a href="#"
+                                <!-- <a href="export-pdf.php"
                                     class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm">
-                                    Export</a>
+                                    Export</a> -->
                             </div>
                             <div class="flex gap-x-2">
-                                <div class="relative flex h-10 w-full min-w-[200px] lg:max-w-[24rem] self-end">
+                                <form action="index.php" method="get"
+                                    class="relative flex h-10 w-full min-w-[200px] lg:max-w-[24rem] self-end">
                                     <button
                                         class="absolute right-1 top-1 z-10 select-none rounded bg-blue-500 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-blue-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none"
-                                        type="button" data-ripple-light="true">
+                                        type="submit" data-ripple-light="true">
                                         Cari
                                     </button>
                                     <input type="text"
                                         class="peer h-full w-full rounded-[7px] border border-blue-gray-200 bg-transparent px-3 py-2.5 pr-20 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-blue-500 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
-                                        placeholder=" " required />
+                                        placeholder=" " name="cari" />
                                     <label
                                         class="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:!border-blue-500 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:!border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
                                         Cari Nama Murid
                                     </label>
-                                </div>
+                                </form>
                             </div>
                         </div>
                         <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
@@ -160,46 +169,46 @@ $list = $conn->query("SELECT * FROM tbnilai");
                                                 </div>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">Budi</p>
+                                                <p class="text-gray-900 whitespace-no-wrap"><?= $row["nama"]; ?></p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">6</p>
+                                                <p class="text-gray-900 whitespace-no-wrap"><?= $row["kelas"]; ?></p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">Matematika</p>
+                                                <p class="text-gray-900 whitespace-no-wrap">
+                                                    <?= $row["mata_pelajaran"]; ?></p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap text-center">
-                                                    <?php 
-                                                    $ulangan = $row["nilai_ulangan"];
-                                                    $uts = $row["nilai_uts"];
-                                                    $uas = $row["nilai_uas"];
-                                                    $result = ((2*$ulangan)+$uts+$uas) / 4;
-                                                    if($result >= 85) {
-                                                        $raport = 'A';
-                                                    } else if ($result >= 75) {
-                                                        $raport = 'B';
-                                                    } else if ($result >= 65) {
-                                                        $raport = 'C';
-                                                    } else if ($result >= 45) {
-                                                        $raport = 'D';
-                                                    } else {
-                                                        $raport = 'E';
-                                                    }
-                                                    
-                                                    if ($raport == 'A' || $raport == 'B' || $raport == 'C') {
-                                                        $final = 'Lulus';
-                                                    } elseif ($raport == 'D') {
-                                                        $final = 'Diambang Tidak Lulus';
-                                                    } else {
-                                                        $final = 'Tidak Lulus';
-                                                    }
-                                                    ?>
-                                                    <?= $raport.' - '.$final ?>
+                                                <p class="text-gray-900 whitespace-no-wrap">
+                                                    <?php
+                                                        $ulangan = $row["nilai_ulangan"];
+                                                        $uts = $row["nilai_uts"];
+                                                        $uas = $row["nilai_uas"];
+                                                        $result = ($ulangan + $uts + $uas) / 3;
+                                                        if ($result >= 85) {
+                                                            $raport = 'A';
+                                                        } else if ($result >= 75) {
+                                                            $raport = 'B';
+                                                        } else if ($result >= 65) {
+                                                            $raport = 'C';
+                                                        } else if ($result >= 45) {
+                                                            $raport = 'D';
+                                                        } else {
+                                                            $raport = 'E';
+                                                        }
+
+                                                        if ($raport == 'A' || $raport == 'B' || $raport == 'C') {
+                                                            $final = 'Lulus';
+                                                        } elseif ($raport == 'D') {
+                                                            $final = 'Diambang Tidak Lulus';
+                                                        } else {
+                                                            $final = 'Tidak Lulus';
+                                                        }
+                                                        ?>
+                                                    <?= $raport . ' - ' . $final ?>
                                                 </p>
                                             </td>
-                                            <td
-                                                class="px-5 py-5 border-b border-gray-200 text-sm flex justify-center items-baseline">
+                                            <td class="px-5 py-5 border-b border-gray-200 text-sm text-nowrap">
                                                 <div x-data="{ showModal: false }">
                                                     <a href='#' @click="showModal = true"
                                                         class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded hover:bg-blue-500 hover:text-white">
@@ -239,61 +248,61 @@ $list = $conn->query("SELECT * FROM tbnilai");
                                                                                         <span
                                                                                             class="font-bold w-32">NIS</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            8572057490</span>
+                                                                                            <?= $row["nis"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Nama</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            Khoirul Anwar</span>
+                                                                                            <?= $row["nama"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Kelas</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            6</span>
+                                                                                            <?= $row["kelas"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Mata
                                                                                             Pelajaran</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            Matematika</span>
+                                                                                            <?= $row["mata_pelajaran"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Guru
                                                                                             Pengampu</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            Pak Joko</span>
+                                                                                            <?php echo htmlspecialchars($_SESSION["nama_guru"]); ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Nilai
                                                                                             Ulangan</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            80</span>
+                                                                                            <?= $row["nilai_ulangan"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Nilai
                                                                                             UTS</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            80</span>
+                                                                                            <?= $row["nilai_uts"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Nilai
                                                                                             UAS</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            80</span>
+                                                                                            <?= $row["nilai_uas"]; ?></span>
                                                                                     </li>
                                                                                     <li class="flex border-b py-2">
                                                                                         <span
                                                                                             class="font-bold w-32">Hasil
                                                                                             Raport</span>
                                                                                         <span class="text-gray-700">:
-                                                                                            B</span>
+                                                                                            <?= $raport . ' - ' . $final ?></span>
                                                                                     </li>
                                                                                 </ul>
                                                                             </div>
@@ -324,14 +333,14 @@ $list = $conn->query("SELECT * FROM tbnilai");
                 <div class="flex flex-col justify-center px-12 py-8 gap-y-4">
                     <a href="index.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">Raport
                             Murid</span>
                     </a>
                     <a href="profile.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
-                        <span class=" text-sm font-medium mt-1 capitalize">profile</span>
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
+                        <span class=" text-sm font-medium mt-1 capitalize">Ganti Password</span>
                     </a>
                 </div>
             </div>

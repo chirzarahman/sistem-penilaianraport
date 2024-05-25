@@ -45,7 +45,7 @@ $list = $conn->query("SELECT * FROM tbmapel");
                             Admin dapat menambah, mengedit, menghapus data guru dan murid
                         </p>
                     </div>
-                    <a href="../../index.php"
+                    <a href="../../logout.php"
                         class="bg-[#fd3030] rounded-xl text-white px-8 py-3 mt-10 w-full text-center hover:shadow-xl hover:shadow-[#fd30306a] transition hover:duration-500 cursor-pointer flex items-center justify-center gap-x-2">
                         <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
                             <path clip-rule="evenodd"
