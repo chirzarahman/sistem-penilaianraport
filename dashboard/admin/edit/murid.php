@@ -6,84 +6,131 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
     exit;
 }
 
-// require_once "../../../config/connect.php";
+require_once "../../../config/connect.php";
 
-// $nig = $nama = "";
-// $nig_err = $nama_err = "";
+$nis = $nama = $no_telp = $nama_ortu = $alamat = $password = "";
+$tgl_lahir = 0;
+$nis_err = $nama_err = $tgl_lahir_err = $no_telp_err = $nama_ortu_err = $alamat_err = $password_err = "";
 
-// if (isset($_POST["nig"]) && !empty($_POST["nig"])) {
-//     $get_nig = $_POST["nig"];
+if (isset($_POST["nis"]) && !empty($_POST["nis"])) {
+    $get_nis = $_POST["nis"];
 
-//     $input_nig = trim($_POST["nig"]);
-//     if (empty($input_nig)) {
-//         $nig_err = "Mohon masukkan nig.";
-//     } else {
-//         $nig = $input_nig;
-//     }
+    //Validate NIS
+    $input_nis = trim($_POST["nis"]);
+    if (empty($input_nis)) {
+        $nis_err = "Mohon masukkan nis.";
+    } else {
+        $nis = $input_nis;
+    }
 
-//     $input_nama = trim($_POST["nama"]);
-//     if (empty($input_nama)) {
-//         $nama_err = "Mohon masukkan nama.";
-//     } else {
-//         $nama = $input_nama;
-//     }
+    //Validate Nama
+    $input_nama = trim($_POST["nama"]);
+    if (empty($input_nama)) {
+        $nama_err = "Mohon masukkan nama.";
+    } else {
+        $nama = $input_nama;
+    }
 
-//     if (empty($nig_err) && empty($nama_err)) {
-//         $sql = "UPDATE tbguru SET nig=:nig, nama_guru=:nama WHERE nig=:nig";
+    //Validate Tanggal Lahir
+    $input_tglLahir = trim($_POST["tanggal_lahir"]);
+    if (empty($input_tglLahir)) {
+        $tgl_lahir_err = "Mohon masukkan tanggal lahir.";
+    } else {
+        $tgl_lahir = $input_tglLahir;
+    }
 
-//         if ($stmt = $conn->prepare($sql)) {
-//             $stmt->bindParam(":nig", $param_nig);
-//             $stmt->bindParam(":nama", $param_nama);
+    //Validate Nomor Telepon
+    $input_noTelp = trim($_POST["no_telepon"]);
+    if (empty($input_noTelp)) {
+        $no_telp_err = "Mohon masukkan nomor telepon.";
+    } else {
+        $no_telp = $input_noTelp;
+    }
 
-//             $param_nig = $nig;
-//             $param_nama = $nama;
+    //Validate Nama Orang Tua
+    $input_namaOrtu = trim($_POST["nama_ortu"]);
+    if (empty($input_namaOrtu)) {
+        $nama_ortu_err = "Mohon masukkan nama orang tua.";
+    } else {
+        $nama_ortu = $input_namaOrtu;
+    }
 
-//             if ($stmt->execute()) {
-//                 header("location: ../list-guru.php");
-//                 exit();
-//             } else {
-//                 echo "Ups! Ada yang salah. Silakan coba lagi nanti";
-//             }
-//         }
+    //Validate Alamat
+    $input_alamat = trim($_POST["alamat"]);
+    if (empty($input_alamat)) {
+        $alamat_err = "Mohon masukkan alamat.";
+    } else {
+        $alamat = $input_alamat;
+    }
 
-//         unset($stmt);
-//     }
+    if (empty($nis_err) && empty($nama_err) && empty($tgl_lahir_err) && empty($no_telp_err) && empty($nama_ortu_err) && empty($alamat_err)) {
+        $sql = "UPDATE tbmurid SET nis=:nis, nama=:nama, tanggal_lahir=:tanggal_lahir, alamat=:alamat, nama_ortu=:nama_ortu, no_telepon=:no_telepon WHERE nis=:nis";
 
-//     unset($conn);
-// } else {
-//     if (isset($_GET["nig"]) && !empty(trim($_GET["nig"]))) {
-//         $get_nig =  trim($_GET["nig"]);
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bindParam(":nis", $param_nis);
+            $stmt->bindParam(":nama", $param_nama);
+            $stmt->bindParam(":tanggal_lahir", $param_tgl_lahir);
+            $stmt->bindParam(":no_telepon", $param_no_telp);
+            $stmt->bindParam(":nama_ortu", $param_nama_ortu);
+            $stmt->bindParam(":alamat", $param_alamat);
 
-//         $sql = "SELECT * FROM tbguru WHERE nig = :nig";
-//         if ($stmt = $conn->prepare($sql)) {
-//             $stmt->bindParam(":nig", $param_nig);
+            $param_nis = $nis;
+            $param_nama = $nama;
+            $param_tgl_lahir = $tgl_lahir;
+            $param_no_telp = $no_telp;
+            $param_nama_ortu = $nama_ortu;
+            $param_alamat = $alamat;
 
-//             $param_nig = $get_nig;
+            if ($stmt->execute()) {
+                header("location: ../list-murid.php");
+                exit();
+            } else {
+                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+            }
+        }
 
-//             if ($stmt->execute()) {
-//                 if ($stmt->rowCount() == 1) {
-//                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        unset($stmt);
+    }
 
-//                     $nig = $row["nig"];
-//                     $nama = $row["nama_guru"];
-//                 } else {
-//                     // header("location: error.php");
-//                     echo ("gagal error");
-//                     exit();
-//                 }
-//             } else {
-//                 echo "Ups! Ada yang salah. Silakan coba lagi nanti";
-//             }
-//         }
+    unset($conn);
+} else {
+    if (isset($_GET["nis"]) && !empty(trim($_GET["nis"]))) {
+        $get_nis =  trim($_GET["nis"]);
 
-//         unset($stmt);
-//         unset($conn);
-//     } else {
-//         // header("location: error.php");
-//         echo ("gagal error");
-//         exit();
-//     }
-// }
+        $sql = "SELECT nis, nama, tanggal_lahir, alamat, nama_ortu, no_telepon FROM tbmurid WHERE nis = :nis";
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bindParam(":nis", $param_nis);
+
+            $param_nis = $get_nis;
+
+            if ($stmt->execute()) {
+                if ($stmt->rowCount() == 1) {
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    $nis = $row["nis"];
+                    $nama = $row["nama"];
+                    $tgl_lahir = $row["tanggal_lahir"];
+                    $alamat = $row["alamat"];
+                    $nama_ortu = $row["nama_ortu"];
+                    $no_telp = $row["no_telepon"];
+                } else {
+                    // header("location: error.php");
+                    echo ("gagal error");
+                    exit();
+                }
+            } else {
+                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+            }
+        }
+
+        unset($stmt);
+        unset($conn);
+    } else {
+        // header("location: error.php");
+        echo ("gagal error");
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -119,7 +166,7 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                             Admin dapat menambah, mengedit, menghapus data guru dan murid
                         </p>
                     </div>
-                    <a href="../../../index.php"
+                    <a href="../../../logout.php"
                         class="bg-[#fd3030] rounded-xl text-white px-8 py-3 mt-10 w-full text-center hover:shadow-xl hover:shadow-[#fd30306a] transition hover:duration-500 cursor-pointer flex items-center justify-center gap-x-2">
                         <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
                             <path clip-rule="evenodd"
@@ -141,7 +188,7 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                 <div class="flex flex-col justify-center px-12 py-6 gap-y-4">
                     <a href="../list-guru.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-white">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
                         <span class=" text-sm font-medium mt-1 capitalize">guru</span>
                     </a>
                     <a href="../list-murid.php"
@@ -151,7 +198,7 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                     </a>
                     <a href="../list-mapel.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">mata pelajaran</span>
                     </a>
                 </div>
@@ -163,36 +210,52 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                 </div>
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
-                        <form action="#" class="space-y-4">
+                        <form action="<?php echo htmlspecialchars(basename($_SERVER['REQUEST_URI'])); ?>" method="post"
+                            class="space-y-4">
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="NIS" type="text" />
+                                        placeholder="NIS" type="text" name="nis" value="<?php echo $nis; ?>" />
                                 </div>
 
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Nama" type="text" />
+                                        placeholder="Nama" type="text" name="nama" value="<?php echo $nama; ?>" />
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Tanggal Lahir" type="text" />
+                                    <div class="relative max-w-sm">
+                                        <div
+                                            class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                viewBox="0 0 20 20">
+                                                <path
+                                                    d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <input datepicker datepicker-format="yyyy-mm-dd" type="text"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-3"
+                                            placeholder="Tanggal Lahir" name="tanggal_lahir"
+                                            value="<?php echo $tgl_lahir; ?>">
+                                    </div>
                                 </div>
 
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="No Telp" type="text" />
+                                        placeholder="No Telp" type="text" name="no_telepon"
+                                        value="<?php echo $no_telp; ?>" />
                                 </div>
                             </div>
                             <div>
                                 <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                    placeholder="Nama Orang Tua" type="text" />
+                                    placeholder="Nama Orang Tua" type="text" name="nama_ortu"
+                                    value="<?php echo $nama_ortu; ?>" />
                             </div>
                             <div>
                                 <textarea class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                    placeholder="Alamat" rows="8"></textarea>
+                                    placeholder="Alamat" rows="8" name="alamat"><?php echo $alamat; ?></textarea>
                             </div>
                             <div class="mt-4 flex items-center gap-x-4">
                                 <a href="../list-murid.php"
@@ -212,7 +275,7 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                 <div class="flex flex-col justify-center px-12 py-8 gap-y-4">
                     <a href="../list-guru.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-white">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
                         <span class=" text-sm font-medium mt-1 capitalize">guru</span>
                     </a>
                     <a href="../list-murid.php"
@@ -222,7 +285,7 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                     </a>
                     <a href="../list-mapel.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">mata pelajaran</span>
                     </a>
                 </div>
@@ -230,5 +293,6 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
         </div>
     </main>
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script>
 
 </html>

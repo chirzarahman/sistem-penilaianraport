@@ -8,7 +8,7 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
 
 require_once "../../config/connect.php";
 
-$list = $conn->query("SELECT * FROM tbmapel");
+$list = $conn->query("SELECT tbmapel.*, tbguru.nama_guru FROM tbmapel JOIN tbguru ON tbmapel.nig=tbguru.nig");
 
 ?>
 
@@ -67,7 +67,7 @@ $list = $conn->query("SELECT * FROM tbmapel");
                 <div class="flex flex-col justify-center px-12 py-6 gap-y-4">
                     <a href="list-guru.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-white">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
                         <span class=" text-sm font-medium mt-1 capitalize">guru</span>
                     </a>
                     <a href="list-murid.php"
@@ -77,7 +77,7 @@ $list = $conn->query("SELECT * FROM tbmapel");
                     </a>
                     <a href="list-mapel.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">mata pelajran</span>
                     </a>
                 </div>
@@ -156,11 +156,12 @@ $list = $conn->query("SELECT * FROM tbmapel");
                                                 </p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                <p class="text-gray-900 whitespace-no-wrap">Bapak Budi</p>
+                                                <p class="text-gray-900 whitespace-no-wrap"><?= $row["nama_guru"]; ?>
+                                                </p>
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                 <div class="flex justify-center items-baseline">
-                                                    <a href='edit/mapel.php'
+                                                    <a href='edit/mapel.php?kode=<?= $row["kode"]; ?>'
                                                         class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded hover:bg-blue-500 hover:text-white">
                                                         Edit
                                                     </a>
@@ -271,7 +272,7 @@ $list = $conn->query("SELECT * FROM tbmapel");
                     </a>
                     <a href="list-mapel.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">mata pelajran</span>
                     </a>
                 </div>

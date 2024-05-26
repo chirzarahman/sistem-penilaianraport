@@ -11,7 +11,6 @@ require_once "../../config/connect.php";
 $new_password = $confirm_password = "";
 $new_password_err = $confirm_password_err = "";
 
-// Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Validate new password
@@ -33,36 +32,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Check input errors before updating the database
     if (empty($new_password_err) && empty($confirm_password_err)) {
-        // Prepare an update statement
         $sql = "UPDATE tbguru SET password_guru = :password WHERE nig = :nig";
 
         if ($stmt = $conn->prepare($sql)) {
-            // Bind variables to the prepared statement as parameters
             $stmt->bindParam(":password", $param_password, PDO::PARAM_STR);
             $stmt->bindParam(":nig", $param_nig, PDO::PARAM_STR);
 
-            // Set parameters
             $param_password = password_hash($new_password, PASSWORD_DEFAULT);
             $param_nig = $_SESSION["nig"];
 
-            // Attempt to execute the prepared statement
             if ($stmt->execute()) {
-                // Password updated successfully. Destroy the session, and redirect to login page
                 session_destroy();
-                header("location: index.php");
+                header("location: ../../index.php");
                 exit();
             } else {
                 echo "Ups! Ada yang salah. Silakan coba lagi nanti";
             }
 
-            // Close statement
             unset($stmt);
         }
     }
 
-    // Close connection
     unset($conn);
 }
 ?>
@@ -101,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             raport
                         </p>
                     </div>
-                    <a href="../../index.php"
+                    <a href="../../logout.php"
                         class="bg-[#fd3030] rounded-xl text-white px-8 py-3 mt-10 w-full text-center hover:shadow-xl hover:shadow-[#fd30306a] transition hover:duration-500 cursor-pointer flex items-center justify-center gap-x-2">
                         <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
                             <path clip-rule="evenodd"
@@ -141,16 +132,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="py-8">
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-
-                            <!-- <div>
-                                <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm hidden"
-                                    placeholder="NIG" name="nig" value="<?php echo $nig; ?>" type="text" />
-                            </div> -->
-
-                            <!-- <div>
-                                <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm" placeholder="Nama"
-                                    name="nama" value="<?php echo $nama; ?>" type="text" />
-                            </div> -->
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm mb-1"

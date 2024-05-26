@@ -89,8 +89,8 @@ if (isset($_GET['kelas']) && $_GET['kelas'] != '') {
                         <span class=" text-sm font-medium mt-1 capitalize">Raport</span>
                     </a>
                     <a href="profile.php" class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                    hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
-                        <span class=" text-sm font-medium mt-1 capitalize">profile</span>
+                    hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
+                        <span class=" text-sm font-medium mt-1 capitalize">ganti password</span>
                     </a>
                 </div>
             </div>
@@ -105,9 +105,9 @@ if (isset($_GET['kelas']) && $_GET['kelas'] != '') {
                             <div>
                                 <?php
                                 if (isset($_GET['kelas']) && $_GET['kelas'] != '') {
-                                    if($list->rowCount() > 0){
-                                    $kelas = $_GET['kelas'];
-                                    echo '<a href="export-pdf.php?kelas='.$kelas.'"
+                                    if ($list->rowCount() > 0) {
+                                        $kelas = $_GET['kelas'];
+                                        echo '<a href="export-pdf.php?kelas=' . $kelas . '"
                                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm
                                 px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700
                                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto
@@ -117,7 +117,7 @@ if (isset($_GET['kelas']) && $_GET['kelas'] != '') {
                                         echo 'Data Kosong';
                                     }
                                 } else {
-                                echo 'Jika Export Pilih Kelas Terlebih dahulu';
+                                    echo 'Jika Export Pilih Kelas Terlebih dahulu';
                                 }
                                 ?>
 
@@ -342,8 +342,8 @@ if (isset($_GET['kelas']) && $_GET['kelas'] != '') {
                         <span class=" text-sm font-medium mt-1 capitalize">Raport</span>
                     </a>
                     <a href="profile.php" class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                    hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
-                        <span class=" text-sm font-medium mt-1 capitalize">profile</span>
+                    hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
+                        <span class=" text-sm font-medium mt-1 capitalize">ganti password</span>
                     </a>
                 </div>
             </div>

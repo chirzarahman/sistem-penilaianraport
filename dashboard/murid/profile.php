@@ -1,3 +1,63 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["loggedin_murid"]) || $_SESSION["loggedin_murid"] !== true) {
+    header("location: ../../login/murid.php");
+    exit;
+}
+
+require_once "../../config/connect.php";
+
+$new_password = $confirm_password = "";
+$new_password_err = $confirm_password_err = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // Validate new password
+    if (empty(trim($_POST["new_password"]))) {
+        $new_password_err = "Mohon masukkan password baru.";
+    } elseif (strlen(trim($_POST["new_password"])) < 6) {
+        $new_password_err = "Kata sandi harus memiliki minimal 6 karakter.";
+    } else {
+        $new_password = trim($_POST["new_password"]);
+    }
+
+    // Validate confirm password
+    if (empty(trim($_POST["confirm_password"]))) {
+        $confirm_password_err = "Mohon masukkan konfirmasi password.";
+    } else {
+        $confirm_password = trim($_POST["confirm_password"]);
+        if (empty($new_password_err) && ($new_password != $confirm_password)) {
+            $confirm_password_err = "Kata sandi tidak cocok.";
+        }
+    }
+
+    if (empty($new_password_err) && empty($confirm_password_err)) {
+        $sql = "UPDATE tbmurid SET password = :password WHERE nis = :nis";
+
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bindParam(":password", $param_password, PDO::PARAM_STR);
+            $stmt->bindParam(":nis", $param_nis, PDO::PARAM_STR);
+
+            $param_password = password_hash($new_password, PASSWORD_DEFAULT);
+            $param_nis = $_SESSION["nis"];
+
+            if ($stmt->execute()) {
+                session_destroy();
+                header("location: ../../index.php");
+                exit();
+            } else {
+                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+            }
+
+            unset($stmt);
+        }
+    }
+
+    unset($conn);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -66,60 +126,39 @@
                     </a>
                     <a href="profile.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white">
-                        <span class=" text-sm font-medium mt-1 capitalize">profile</span>
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white text-center">
+                        <span class=" text-sm font-medium mt-1 capitalize">ganti password</span>
                     </a>
                 </div>
             </div>
             <div class="bg-white w-full h-max rounded-md shadow-2xl py-7">
                 <div class="relative w-max pb-3 ml-4 lg:mx-10">
                     <div class="absolute border-b-4 border-blue-500 bottom-0 left-0 w-14 rounded-full"></div>
-                    <h2 class="font-semibold text-[2rem] uppercase">Profile</h2>
+                    <h2 class="font-semibold text-[2rem] uppercase">Ganti Password</h2>
                 </div>
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="py-8">
-                        <form action="#">
-                            <div class="space-y-2">
-                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <div>
-                                        <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                            placeholder="NIS" type="text" />
-                                    </div>
-
-                                    <div>
-                                        <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                            placeholder="Nama" type="text" />
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <div>
-                                        <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                            placeholder="Tanggal Lahir" type="text" />
-                                    </div>
-
-                                    <div>
-                                        <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                            placeholder="No Telp" type="text" />
+                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm mb-1"
+                                        placeholder="Password" id="password" name="new_password" type="password" />
+                                    <span
+                                        class="peer-invalid:visible text-pink-600 text-sm"><?php echo $new_password_err; ?></span>
+                                    <div class="flex items-center mt-1">
+                                        <input id="visibility-password" onclick="visibilityPass()" type="checkbox"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+                                        <label for="visibility-password"
+                                            class="ms-2 text-sm font-medium text-gray-900">Lihat
+                                            Password</label>
                                     </div>
                                 </div>
                                 <div>
-                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Nama Orang Tua" type="text" />
-                                </div>
-                                <div>
-                                    <textarea class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Alamat" rows="8"></textarea>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 gap-y-2 sm:gap-x-0 sm:gap-x-4 sm:grid-cols-2">
-                                <div>
-                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Password" type="password" />
-                                </div>
-
-                                <div>
-                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Konfirmasi Password" type="password" />
+                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm mb-1"
+                                        placeholder="Konfirmasi Password" id="password" name="confirm_password"
+                                        type="password" />
+                                    <span
+                                        class="peer-invalid:visible text-pink-600 text-sm"><?php echo $confirm_password_err; ?></span>
                                 </div>
                             </div>
                             <div class="mt-4 flex items-center gap-x-4">
@@ -144,8 +183,8 @@
                     </a>
                     <a href="profile.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white">
-                        <span class=" text-sm font-medium mt-1 capitalize">profile</span>
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-blue-500 text-white text-center">
+                        <span class=" text-sm font-medium mt-1 capitalize">ganti password</span>
                     </a>
                 </div>
             </div>
@@ -153,5 +192,15 @@
     </main>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2"></script>
+<script>
+function visibilityPass() {
+    var x = document.getElementById("password");
+    if (x.type === "password") {
+        x.type = "text";
+    } else {
+        x.type = "password";
+    }
+}
+</script>
 
 </html>

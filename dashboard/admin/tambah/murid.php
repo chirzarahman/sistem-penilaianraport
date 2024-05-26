@@ -6,51 +6,94 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
     exit;
 }
 
-// require_once "../../../config/connect.php";
+require_once "../../../config/connect.php";
 
-// $nig = $nama = $password = "";
-// $nig_err = $nama_err = $password_err = "";
+$nis = $nama = $no_telp = $nama_ortu = $alamat = $password = "";
+$tgl_lahir = 0;
+$nis_err = $nama_err = $tgl_lahir_err = $no_telp_err = $nama_ortu_err = $alamat_err = $password_err = "";
 
-// if ($_SERVER["REQUEST_METHOD"] == "POST") {
-//     $input_nig = trim($_POST["nig"]);
-//     if (empty($input_nig)) {
-//         $nig_err = "Mohon masukkan nig.";
-//     } else {
-//         $nig = $input_nig;
-//     }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    //Validate NIS
+    $input_nis = trim($_POST["nis"]);
+    if (empty($input_nis)) {
+        $nis_err = "Mohon masukkan nis.";
+    } else {
+        $nis = $input_nis;
+    }
 
-//     $input_nama = trim($_POST["nama"]);
-//     if (empty($input_nama)) {
-//         $nama_err = "Mohon masukkan nama.";
-//     } else {
-//         $nama = $input_nama;
-//     }
+    //Validate Nama
+    $input_nama = trim($_POST["nama"]);
+    if (empty($input_nama)) {
+        $nama_err = "Mohon masukkan nama.";
+    } else {
+        $nama = $input_nama;
+    }
 
-//     if (empty($nig_err) && empty($nama_err) && empty($password_err)) {
-//         $sql = "INSERT INTO tbguru (nig, nama_guru, password_guru) VALUES (:nig, :nama, :password)";
+    //Validate Tanggal Lahir
+    $input_tglLahir = trim($_POST["tanggal_lahir"]);
+    if (empty($input_tglLahir)) {
+        $tgl_lahir_err = "Mohon masukkan tanggal lahir.";
+    } else {
+        $tgl_lahir = $input_tglLahir;
+    }
 
-//         if ($stmt = $conn->prepare($sql)) {
-//             $stmt->bindParam(":nig", $param_nig);
-//             $stmt->bindParam(":nama", $param_nama);
-//             $stmt->bindParam(":password", $param_password);
+    //Validate Nomor Telepon
+    $input_noTelp = trim($_POST["no_telepon"]);
+    if (empty($input_noTelp)) {
+        $no_telp_err = "Mohon masukkan nomor telepon.";
+    } else {
+        $no_telp = $input_noTelp;
+    }
 
-//             $param_nig = $nig;
-//             $param_nama = $nama;
-//             $param_password = password_hash($password, PASSWORD_DEFAULT);
+    //Validate Nama Orang Tua
+    $input_namaOrtu = trim($_POST["nama_ortu"]);
+    if (empty($input_namaOrtu)) {
+        $nama_ortu_err = "Mohon masukkan nama orang tua.";
+    } else {
+        $nama_ortu = $input_namaOrtu;
+    }
 
-//             if ($stmt->execute()) {
-//                 header("location: ../list-guru.php");
-//                 exit();
-//             } else {
-//                 echo "Ups! Ada yang salah. Silakan coba lagi nanti";
-//             }
-//         }
+    //Validate Alamat
+    $input_alamat = trim($_POST["alamat"]);
+    if (empty($input_alamat)) {
+        $alamat_err = "Mohon masukkan alamat.";
+    } else {
+        $alamat = $input_alamat;
+    }
 
-//         unset($stmt);
-//     }
+    if (empty($nis_err) && empty($nama_err) && empty($tgl_lahir_err) && empty($no_telp_err) && empty($nama_ortu_err) && empty($alamat_err) && empty($password_err)) {
+        $sql = "INSERT INTO tbmurid (nis, nama, tanggal_lahir, no_telepon, nama_ortu, alamat, password) VALUES (:nis, :nama, :tanggal_lahir, :no_telepon, :nama_ortu, :alamat, :password)";
 
-//     unset($conn);
-// }
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bindParam(":nis", $param_nis);
+            $stmt->bindParam(":nama", $param_nama);
+            $stmt->bindParam(":tanggal_lahir", $param_tgl_lahir);
+            $stmt->bindParam(":no_telepon", $param_no_telp);
+            $stmt->bindParam(":nama_ortu", $param_nama_ortu);
+            $stmt->bindParam(":alamat", $param_alamat);
+            $stmt->bindParam(":password", $param_password);
+
+            $param_nis = $nis;
+            $param_nama = $nama;
+            $param_tgl_lahir = $tgl_lahir;
+            $param_no_telp = $no_telp;
+            $param_nama_ortu = $nama_ortu;
+            $param_alamat = $alamat;
+            $param_password = password_hash($password, PASSWORD_DEFAULT);
+
+            if ($stmt->execute()) {
+                header("location: ../list-murid.php");
+                exit();
+            } else {
+                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+            }
+        }
+
+        unset($stmt);
+    }
+
+    unset($conn);
+}
 ?>
 
 <!DOCTYPE html>
@@ -86,7 +129,7 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                             Admin dapat menambah, mengedit, menghapus data guru dan murid
                         </p>
                     </div>
-                    <a href="../../../index.php"
+                    <a href="../../../logout.php"
                         class="bg-[#fd3030] rounded-xl text-white px-8 py-3 mt-10 w-full text-center hover:shadow-xl hover:shadow-[#fd30306a] transition hover:duration-500 cursor-pointer flex items-center justify-center gap-x-2">
                         <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
                             <path clip-rule="evenodd"
@@ -130,36 +173,68 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
                 </div>
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
-                        <form action="#" class="space-y-4">
+                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post"
+                            class="space-y-4">
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="NIS" type="text" />
+                                        placeholder="NIS" name="nis" type="text" />
+                                    <span
+                                        class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $nis_err; ?></span>
                                 </div>
 
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Nama" type="text" />
+                                        placeholder="Nama" name="nama" type="text" />
+                                    <span
+                                        class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $nama_err; ?></span>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Tanggal Lahir" type="text" />
+                                    <div class="relative max-w-sm">
+                                        <div
+                                            class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                viewBox="0 0 20 20">
+                                                <path
+                                                    d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <input datepicker datepicker-format="yyyy-mm-dd" type="text"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-3"
+                                            placeholder="Tanggal Lahir" name="tanggal_lahir">
+                                    </div>
+                                    <span
+                                        class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $tgl_lahir_err; ?></span>
                                 </div>
 
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="No Telp" type="text" />
+                                        placeholder="No Telp" name="no_telepon" type="text" />
+                                    <span
+                                        class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $no_telp_err; ?></span>
                                 </div>
                             </div>
                             <div>
                                 <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                    placeholder="Nama Orang Tua" type="text" />
+                                    placeholder="Nama Orang Tua" name="nama_ortu" type="text" />
+                                <span
+                                    class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $nama_ortu_err; ?></span>
                             </div>
                             <div>
                                 <textarea class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                    placeholder="Alamat" rows="8"></textarea>
+                                    placeholder="Alamat" name="alamat" rows="8"></textarea>
+                                <span
+                                    class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $alamat_err; ?></span>
+                            </div>
+
+                            <div>
+                                <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm hidden"
+                                    placeholder="Password" name="password" type="text" value="12345" />
+                                <span
+                                    class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $password_err; ?></span>
                             </div>
                             <div class="mt-4 flex items-center gap-x-4">
                                 <a href="../list-murid.php"
@@ -197,5 +272,6 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
         </div>
     </main>
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script>
 
 </html>

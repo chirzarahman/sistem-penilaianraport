@@ -117,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             Admin dapat menambah, mengedit, menghapus data guru dan murid
                         </p>
                     </div>
-                    <a href="../../../index.php"
+                    <a href="../../../logout.php"
                         class="bg-[#fd3030] rounded-xl text-white px-8 py-3 mt-10 w-full text-center hover:shadow-xl hover:shadow-[#fd30306a] transition hover:duration-500 cursor-pointer flex items-center justify-center gap-x-2">
                         <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
                             <path clip-rule="evenodd"
@@ -178,7 +178,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
 
                                 <div>
-                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
+                                    <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm hidden"
                                         placeholder="Password" name="password" type="text" value="12345" />
                                     <span
                                         class="mt-2 peer-invalid:visible text-pink-600 text-sm"><?php echo $password_err; ?></span>

@@ -77,7 +77,7 @@ $list = $conn->query("SELECT nig, nama_guru FROM tbguru");
                     </a>
                     <a href="list-mapel.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">mata pelajaran</span>
                     </a>
                 </div>
@@ -262,7 +262,7 @@ $list = $conn->query("SELECT nig, nama_guru FROM tbguru");
                     </a>
                     <a href="list-mapel.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">mata pelajaran</span>
                     </a>
                 </div>

@@ -8,49 +8,69 @@ if (!isset($_SESSION["loggedin_admin"]) || $_SESSION["loggedin_admin"] !== true)
 
 require_once "../../../config/connect.php";
 
-// $nig = $nama = $password = "";
-// $nig_err = $nama_err = $password_err = "";
+$kode = $mapel = $kelas = $nig = "";
+$kode_err = $mapel_err = $kelas_err = $nig_err = "";
 
-// if ($_SERVER["REQUEST_METHOD"] == "POST") {
-//     $input_nig = trim($_POST["nig"]);
-//     if (empty($input_nig)) {
-//         $nig_err = "Mohon masukkan nig.";
-//     } else {
-//         $nig = $input_nig;
-//     }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    //Validate Kode
+    $input_kode = trim($_POST["kode"]);
+    if (empty($input_kode)) {
+        $kode_err = "Mohon masukkan kode.";
+    } else {
+        $kode = $input_kode;
+    }
 
-//     $input_nama = trim($_POST["nama"]);
-//     if (empty($input_nama)) {
-//         $nama_err = "Mohon masukkan nama.";
-//     } else {
-//         $nama = $input_nama;
-//     }
+    //Validate Mata Pelajaran
+    $input_mapel = trim($_POST["mapel"]);
+    if (empty($input_mapel)) {
+        $mapel_err = "Mohon masukkan mata pelajaran.";
+    } else {
+        $mapel = $input_mapel;
+    }
 
-//     if (empty($nig_err) && empty($nama_err) && empty($password_err)) {
-//         $sql = "INSERT INTO tbguru (nig, nama_guru, password_guru) VALUES (:nig, :nama, :password)";
+    //Validate Kode
+    $input_kelas = trim($_POST["kelas"]);
+    if (empty($input_kelas)) {
+        $kelas_err = "Mohon masukkan kelas.";
+    } else {
+        $kelas = $input_kelas;
+    }
 
-//         if ($stmt = $conn->prepare($sql)) {
-//             $stmt->bindParam(":nig", $param_nig);
-//             $stmt->bindParam(":nama", $param_nama);
-//             $stmt->bindParam(":password", $param_password);
+    //Validate NIG
+    $input_nig = trim($_POST["nig"]);
+    if (empty($input_nig)) {
+        $nig_err = "Mohon masukkan nig.";
+    } else {
+        $nig = $input_nig;
+    }
 
-//             $param_nig = $nig;
-//             $param_nama = $nama;
-//             $param_password = password_hash($password, PASSWORD_DEFAULT);
+    if (empty($kode_err) && empty($mapel_err) && empty($kelas_err) && empty($nig_err)) {
+        $sql = "INSERT INTO tbmapel (kode, kelas, mata_pelajaran, nig) VALUES (:kode, :kelas, :mapel, :nig)";
 
-//             if ($stmt->execute()) {
-//                 header("location: ../list-guru.php");
-//                 exit();
-//             } else {
-//                 echo "Ups! Ada yang salah. Silakan coba lagi nanti";
-//             }
-//         }
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bindParam(":kode", $param_kode);
+            $stmt->bindParam(":kelas", $param_kelas);
+            $stmt->bindParam(":mapel", $param_mapel);
+            $stmt->bindParam(":nig", $param_nig);
 
-//         unset($stmt);
-//     }
+            $param_kode = $kode;
+            $param_kelas = $kelas;
+            $param_mapel = $mapel;
+            $param_nig = $nig;
 
-//     unset($conn);
-// }
+            if ($stmt->execute()) {
+                header("location: ../list-mapel.php");
+                exit();
+            } else {
+                echo "Ups! Ada yang salah. Silakan coba lagi nanti";
+            }
+        }
+
+        unset($stmt);
+    }
+
+    unset($conn);
+}
 ?>
 
 <!DOCTYPE html>
@@ -86,7 +106,7 @@ require_once "../../../config/connect.php";
                             Admin dapat menambah, mengedit, menghapus data guru dan murid
                         </p>
                     </div>
-                    <a href="../../../index.php"
+                    <a href="../../../logout.php"
                         class="bg-[#fd3030] rounded-xl text-white px-8 py-3 mt-10 w-full text-center hover:shadow-xl hover:shadow-[#fd30306a] transition hover:duration-500 cursor-pointer flex items-center justify-center gap-x-2">
                         <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
                             <path clip-rule="evenodd"
@@ -108,7 +128,7 @@ require_once "../../../config/connect.php";
                 <div class="flex flex-col justify-center px-12 py-6 gap-y-4">
                     <a href="../list-guru.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-white">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
                         <span class=" text-sm font-medium mt-1 capitalize">guru</span>
                     </a>
                     <a href="../list-murid.php"
@@ -118,7 +138,7 @@ require_once "../../../config/connect.php";
                     </a>
                     <a href="../list-mapel.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">mata pelajaran</span>
                     </a>
                 </div>
@@ -130,37 +150,35 @@ require_once "../../../config/connect.php";
                 </div>
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
-                        <form action="#">
+                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Kode Mapel" type="text" />
+                                        placeholder="Kode Mapel, Contoh : PKN-1 (Mapel-Kelas)" type="text"
+                                        name="kode" />
                                 </div>
 
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Kelas" type="text" />
+                                        placeholder="Kelas" type="text" name="kelas" />
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
                                 <div>
                                     <input class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                        placeholder="Mata Pelajaran" type="text" />
+                                        placeholder="Mata Pelajaran" type="text" name="mapel" />
                                 </div>
 
                                 <div>
-                                    <select class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm">
+                                    <select class="w-full rounded-lg border-2 border-gray-200 p-3 text-sm" name="nig">
                                         <option selected disabled>Pilih Guru</option>
                                         <?php
                                         $list = $conn->query("SELECT nig, nama_guru FROM tbguru");
                                         foreach ($list as $row) :
                                         ?>
-                                        <option value='<?= $row["nig"] ?>'> <?= $row["nig"].' - '. $row["nama_guru"] ?>
+                                        <option value='<?= $row["nig"] ?>'>
+                                            <?= $row["nig"] . ' - ' . $row["nama_guru"] ?>
                                         </option>
-                                        <!-- <option value="US">United States</option>
-                                        <option value="CA">Canada</option>
-                                        <option value="FR">France</option>
-                                        <option value="DE">Germany</option> -->
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
@@ -183,7 +201,7 @@ require_once "../../../config/connect.php";
                 <div class="flex flex-col justify-center px-12 py-8 gap-y-4">
                     <a href="../list-guru.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-white">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
                         <span class=" text-sm font-medium mt-1 capitalize">guru</span>
                     </a>
                     <a href="../list-murid.php"
@@ -193,7 +211,7 @@ require_once "../../../config/connect.php";
                     </a>
                     <a href="../list-mapel.php"
                         class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500
-                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
+                                        hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">mata pelajaran</span>
                     </a>
                 </div>

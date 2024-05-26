@@ -74,7 +74,7 @@ $list = $conn->query("SELECT * FROM tbmurid");
                         <span class=" text-sm font-medium mt-1 capitalize">murid</span>
                     </a>
                     <a href="list-mapel.php"
-                        class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500 hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
+                        class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500 hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">mata pelajaran</span>
                     </a>
                 </div>
@@ -141,7 +141,7 @@ $list = $conn->query("SELECT * FROM tbmurid");
                                             </td>
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                 <div class="flex justify-center items-baseline">
-                                                    <a href='edit/murid.php'
+                                                    <a href='edit/murid.php?nis=<?= $row["nis"]; ?>'
                                                         class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded hover:bg-blue-500 hover:text-white">
                                                         Edit
                                                     </a>
@@ -171,7 +171,7 @@ $list = $conn->query("SELECT * FROM tbmurid");
                         <span class=" text-sm font-medium mt-1 capitalize">murid</span>
                     </a>
                     <a href="list-mapel.php"
-                        class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500 hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500">
+                        class="rounded-lg px-5 py-4 w-full transition hover:duration-700 hover:bg-blue-500 hover:text-white flex flex-col items-center cursor-pointer bg-[#F3F6F6] text-gray-500 text-center">
                         <span class=" text-sm font-medium mt-1 capitalize">mata pelajaran</span>
                     </a>
                 </div>
